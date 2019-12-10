@@ -15,13 +15,13 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const uploadUrl = await generateUploadUrl(userId, todoId)
 
   return {
-    statusCode: 201,
+    statusCode: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true
+      //'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({
-      todoId: todoId,
+      //todoId: todoId,
       uploadUrl: uploadUrl
     })
   }

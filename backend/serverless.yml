@@ -12,15 +12,15 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
 
-  tracing:
-    lambda: true
-    apiGateway: true
+  # tracing:
+  #   lambda: true
+  #   apiGateway: true
 
   environment:
     TODO_TABLE: TODO-${self:provider.stage}
     TODO_ID_INDEX: TodoIdIndex-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 5000
-    IMAGES_S3_BUCKET: todo-images-${self:provider.stage}
+    IMAGES_S3_BUCKET: todo-image-${self:provider.stage}
 
 functions:
 
@@ -122,7 +122,6 @@ functions:
 
 resources:
   Resources:
-    # TODO: Add any necessary AWS resources
     GatewayResponseDefault4XX:
       Type: AWS::ApiGateway::GatewayResponse
       Properties:
@@ -162,40 +161,45 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+    
+    # S3 Bucket
+    AttachmentBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.IMAGES_S3_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            -
+              AllowedOrigins:
+                - '*'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              MaxAge: 3000
 
-AttachmentBucket:
-  Type: AWS::S3::Bucket
-  Properties:
-    BucketName: ${self:provider.environment.IMAGES_S3_BUCKET}
-    CorsConfiguration:
-      CorsRules:
-        -
-          AllowedOrigins:
-            - '*'
-          AllowedHeaders:
-            - '*'
-          AllowedMethods:
-            - GET
-            - PUT
-            - POST
-            - DELETE
-            - HEAD
-          MaxAge: 3000
+    # S3 Bucket Policy
+    BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        PolicyDocument:
+          Id: Policy
+          Version: '2012-10-17'
+          Statement:
+            - Sid: PublicReadForGetBucketObjects
+              Effect: Allow
+              Principal: '*' # Anyone
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+              Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
+        Bucket: !Ref AttachmentBucket
 
-BucketPolicy:
-  Type: AWS::S3::BucketPolicy
-  Properties:
-    PolicyDocument:
-      Id: Policy
-      Version: '2012-10-17'
-      Statement:
-        - Sid: PublicReadWriteBucketPolicy
-          Effect: Allow
-          Principal: '*' # Anyone
-          Action:
-            - s3:GetObject
-            - s3:PutObject
-          Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
-    Bucket: !Ref AttachmentBucket
+
+
 
     
