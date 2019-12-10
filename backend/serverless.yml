@@ -19,7 +19,7 @@ provider:
   environment:
     TODO_TABLE: TODO-${self:provider.stage}
     TODO_ID_INDEX: TodoIdIndex-${self:provider.stage}
-    SIGNED_URL_EXPIRATION: 5000000
+    SIGNED_URL_EXPIRATION: 5000
     IMAGES_S3_BUCKET: todo-images-${self:provider.stage}
 
 functions:

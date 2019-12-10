@@ -1,10 +1,15 @@
 import * as AWS from 'aws-sdk'
 import { TodoItem} from '../models/TodoItem'
 import {TodoUpdate} from '../models/TodoUpdate'
+//import * as AWSXRay from 'aws-xray-sdk'
+//import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 
+//Distributed Tracing
+//const XAWS = AWSXRay.captureAWS(AWS)
 export class todoAccess {
     constructor(
         private readonly docClient = new AWS.DynamoDB.DocumentClient(), 
+        //private readonly docClient: DocumentClient = createDynamoDB(),
         private readonly todoTable = process.env.TODO_TABLE
 
         ) {}
@@ -78,3 +83,12 @@ export class todoAccess {
       }
 }
 
+// function createDynamoDB() {
+//   if (process.env.IS_OFFLINE) {
+//     return new XAWS.DynamoDB.prototype(DocumentClient)({
+//       region: 'localhost',
+//       endpoint: 'http://localhost:8000'
+//     })
+//   }
+//    return new XAWS.DynamoDB.prototype(DocumentClient)
+// }
